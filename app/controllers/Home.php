@@ -1,15 +1,15 @@
-<?php 
+<?php
 
 namespace App\Controllers;
 
 use App\Vendor\Controller;
 
-class Home extends Controller 
+class Home extends Controller
 {
     public function index()
     {
-        echo 'test';
-        return 'test';
+        $data = [];
+        return $this->view('test', $data);
     }
 
     public function about($test = '')
