@@ -7,6 +7,15 @@
             <p>Please fill out this form to register with us</p>
             <form action="<?= URL_ROOT . '/users/register'  ?>" method="post">
                 <div class="form-group">
+                    <label for="user_type">User Type: <sup>*</sup></label>
+                    <select name="category_id" id="user_type" class="custom-select <?= $data['category_id_err'] ? 'is-invalid' : ''; ?>">
+                        <?php foreach ($data['categories'] as $category) : ?>
+                            <option <?= $data['category_id'] == $category->id ? "selected" : '' ?> class="<?= $category->subcategory_id ? '' : 'font-weight-bold' ?>" value="<?= $category->id ?>"><?= $category->name ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="invalid-feedback"><?= $data['category_id_err'] ?></span>
+                </div>
+                <div class="form-group">
                     <label for="name">Name: <sup>*</sup></label>
                     <input type="text" name="name" id="name" value="<?= $data['name'] ?>" class="form-control form-control-lg  <?= $data['name_err'] ? 'is-invalid' : '' ?>">
                     <span class="invalid-feedback"><?= $data['name_err'] ?></span>

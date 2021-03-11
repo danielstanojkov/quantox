@@ -24,10 +24,12 @@ class User extends Controller
 
     public function register($data)
     {
-        $this->db->query("INSERT INTO users(name, email, password) VALUES(:name, :email, :password)");
+
+        $this->db->query("INSERT INTO users(name, email, password, category_id) VALUES(:name, :email, :password, :category_id)");
         $this->db->bind('name', $data['name']);
         $this->db->bind('email', $data['email']);
         $this->db->bind('password', $data['password']);
+        $this->db->bind('category_id', $data['category_id']);
         return $this->db->execute();
     }
 

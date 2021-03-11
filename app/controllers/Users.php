@@ -10,6 +10,7 @@ class Users extends Controller
     public function __construct()
     {
         $this->userModel = $this->model('User');
+        $this->categoryModel = $this->model('Category');
     }
 
     /*
@@ -28,6 +29,7 @@ class Users extends Controller
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
             $data = [
+                'category_id' => $_POST['category_id'],
                 'name' => trim($_POST['name']),
                 'email' =>  trim($_POST['email']),
                 'password' =>  trim($_POST['password']),
@@ -35,8 +37,12 @@ class Users extends Controller
                 'name_err' => '',
                 'email_err' => '',
                 'password_err' => '',
-                'confirm_password_err' => ''
+                'confirm_password_err' => '',
+                'category_id_err' => '',
+                'categories' => $this->categoryModel->getAllCategories()
             ];
+
+
 
             // Validate email
             if (empty($data['email'])) {
@@ -68,8 +74,13 @@ class Users extends Controller
                 }
             }
 
+            // Check if category exist
+            if (!$this->categoryModel->checkIfCategoryExist($data['category_id'])) {
+                $data['category_id_err'] = 'Category does not exist';
+            }
+
             // Check if validation failed
-            if (empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])) {
+            if (empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['confirm_password_err']) && empty($data['category_id_err'])) {
                 $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT); // Hash the password
 
                 if ($this->userModel->register($data)) {
@@ -83,6 +94,7 @@ class Users extends Controller
             return $this->view('users/register', $data);
         } else {
             $data = [
+                'category_id' => '',
                 'name' => '',
                 'email' => '',
                 'password' => '',
@@ -90,7 +102,9 @@ class Users extends Controller
                 'name_err' => '',
                 'email_err' => '',
                 'password_err' => '',
-                'confirm_password_err' => ''
+                'confirm_password_err' => '',
+                'category_id_err' => '',
+                'categories' => $this->categoryModel->getAllCategories()
             ];
 
             return $this->view('users/register', $data);
@@ -162,10 +176,11 @@ class Users extends Controller
         $_SESSION['user_id'] = $user->id;
         $_SESSION['user_name'] = $user->name;
         $_SESSION['user_email'] = $user->email;
-        redirect('posts');
+        flash('login_success', "Welcome, {$user->name}");
+        redirect('home');
     }
 
-    
+
     public function logout()
     {
         session_destroy();
