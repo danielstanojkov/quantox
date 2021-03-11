@@ -7,6 +7,7 @@ class Controller
     public function model($model)
     {
         require_once "../app/models/{$model}.php";
+        $model = "App\\Models\\$model";
         return new $model();
     }
 

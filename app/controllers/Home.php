@@ -9,11 +9,6 @@ class Home extends Controller
     public function index()
     {
         $data = [];
-        return $this->view('test', $data);
-    }
-
-    public function about($test = '')
-    {
-        echo 'aboutpage' . $test;
+        return $this->view('index', $data);
     }
 }
