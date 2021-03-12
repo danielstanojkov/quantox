@@ -20,12 +20,11 @@ class Results extends Controller
         }
 
         $data = $this->categoryModel->getMainCategories();
-
         $data = $this->buildCategoriesArray($data);
 
         $data = [
             'categories' => $data,
-            'users' => []
+            'users' => $this->userModel->getAllUsers()
         ];
 
         return $this->view('results/index', $data);
@@ -64,7 +63,6 @@ class Results extends Controller
             $users = $this->userModel->findUsersByEmailOrName($data['search']);
 
             $categories = $this->categoryModel->getCategoryByType($is_backend);
-            $categories = $this->countCategoryDevelopers($categories, $users);
             
             // Extracts users to specified category
             $specified_users = [];
@@ -77,7 +75,7 @@ class Results extends Controller
                 }
             }
             
-            $categories = $this->buildCategoriesArray($categories);
+            $categories = $this->buildCategoriesArray($this->categoryModel->getMainCategories());
 
             $data = [
                 'categories' => $categories,
@@ -102,13 +100,14 @@ class Results extends Controller
             // Setting main categories
             $tmp_arr = [
                 'category' => $category,
-                'subcategories' => []
+                'subcategories' => [],
             ];
 
             // Setting second level categories
             foreach ($this->categoryModel->getSubCategory($category->id) as $subcategory) {
                 $second_tmp = [
                     'category' => $subcategory,
+
                     // Setting 3-rd level categories
                     'subcategories' => $this->categoryModel->getSubCategory($subcategory->id)
                 ];
@@ -122,15 +121,4 @@ class Results extends Controller
         return $structured_data;
     }
 
-    public function countCategoryDevelopers($categories, $users)
-    {
-        foreach ($users as $user) {
-            foreach ($categories as $category) {
-                if ($user->category_id !== $category->id) continue;
-                isset($category->count) ? $category->count += 1 : $category->count = 1;
-            }
-        }
-
-        return $categories;
-    }
 }

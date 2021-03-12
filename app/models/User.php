@@ -22,6 +22,17 @@ class User extends Controller
         return $this->db->rowCount() ? true : false;
     }
 
+    public function getAllUsers()
+    {
+        $this->db->query('SELECT *,`categories`.`id` AS `categoryId`,
+                                        `users`.`id` AS `userId`, 
+                                      `users`.`name` AS `username`,
+                                 `categories`.`name` AS `categoryName`
+        FROM users JOIN categories on categories.id = users.category_id');
+
+        return $this->db->resultSet();
+    }
+
     public function findUsersByEmailOrName($string)
     {
         $this->db->query('SELECT *,`categories`.`id` AS `categoryId`,
@@ -33,6 +44,14 @@ class User extends Controller
         $this->db->bind('email', "%$string%");
         $this->db->bind('name', "%$string%");
         return $this->db->resultSet();
+    }
+
+    public function getUsersCountByCategoryId($category_id)
+    {
+        $this->db->query("SELECT * FROM users WHERE category_id = :category_id");
+        $this->db->bind('category_id', $category_id);
+        $this->db->resultSet();
+        return $this->db->rowCount();
     }
 
     public function register($data)

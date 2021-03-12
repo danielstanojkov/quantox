@@ -16,7 +16,7 @@ class Category extends Controller
 
     public function getCategoryByType($type)
     {
-        $this->db->query('SELECT * FROM categories WHERE is_backend = :type AND subcategory_id IS NULL');
+        $this->db->query('SELECT * FROM categories WHERE is_backend = :type');
         $this->db->bind('type', $type);
         return $this->db->resultSet();
     }
