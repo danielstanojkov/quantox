@@ -40,7 +40,7 @@ class Results extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') redirect('home');
 
-
+        
         $data = [
             'search' => trim($_POST['search']),
             'type' => $_POST['user_type'],
