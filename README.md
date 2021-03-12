@@ -1,1 +1,2 @@
 # quantox
+## Everything you need to do in order to start the project is to extract the quantox.sql file placed in the root folder. After you unzip it, import the sql file in your database management system.
