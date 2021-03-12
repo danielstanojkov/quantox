@@ -16,7 +16,20 @@ class Category extends Controller
 
     public function getAllCategories()
     {
-        $this->db->query('SELECT * FROM categories');
+        $this->db->query('SELECT * FROM categories;');
+        return $this->db->resultSet();
+    }
+
+    public function getMainCategories()
+    {
+        $this->db->query('SELECT * FROM categories WHERE subcategory_id IS NULL');
+        return $this->db->resultSet();
+    }
+
+    public function getSubCategory($id)
+    {
+        $this->db->query('SELECT * FROM categories WHERE subcategory_id = :id');
+        $this->db->bind('id', $id);
         return $this->db->resultSet();
     }
 
@@ -27,5 +40,7 @@ class Category extends Controller
         $this->db->single();
         return $this->db->rowCount() ? true : false;
     }
+
+
 
 }

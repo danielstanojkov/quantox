@@ -12,9 +12,11 @@
                 <li class="nav-item">
                     <a class="nav-link mr-2" href="<?= URL_ROOT ?>">Home</a>
                 </li>
-                <li class="nav-item mr-2">
-                    <a class="nav-link" href="<?= URL_ROOT ?>">Results</a>
-                </li>
+                <?php if (isset($_SESSION['user_id'])) : ?>
+                    <li class="nav-item mr-2">
+                        <a class="nav-link" href="<?= URL_ROOT ?>/results">Results</a>
+                    </li>
+                <?php endif; ?>
                 <li class="nav-item">
                     <a class="nav-link" target="_blank" href="https://quantox.com/">About Us</a>
                 </li>
