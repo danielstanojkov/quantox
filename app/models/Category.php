@@ -5,13 +5,20 @@ namespace App\Models;
 use App\Vendor\Controller;
 use App\Vendor\DB;
 
-class Category extends Controller 
+class Category extends Controller
 {
     private $db;
 
     public function __construct()
     {
         $this->db = new DB;
+    }
+
+    public function getCategoryByType($type)
+    {
+        $this->db->query('SELECT * FROM categories WHERE is_backend = :type AND subcategory_id IS NULL');
+        $this->db->bind('type', $type);
+        return $this->db->resultSet();
     }
 
     public function getAllCategories()
@@ -40,7 +47,4 @@ class Category extends Controller
         $this->db->single();
         return $this->db->rowCount() ? true : false;
     }
-
-
-
 }

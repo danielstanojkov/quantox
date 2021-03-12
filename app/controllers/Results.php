@@ -8,6 +8,7 @@ class Results extends Controller
 {
     public function __construct()
     {
+        $this->userModel = $this->model('User');
         $this->categoryModel = $this->model('Category');
     }
 
@@ -21,6 +22,11 @@ class Results extends Controller
         $data = $this->categoryModel->getMainCategories();
 
         $data = $this->buildCategoriesArray($data);
+
+        $data = [
+            'categories' => $data,
+            'users' => []
+        ];
 
         return $this->view('results/index', $data);
     }
@@ -43,21 +49,44 @@ class Results extends Controller
             'type_err' => '',
         ];
 
-        if(empty($data['search'])){
+        if (empty($data['search'])) {
             $data['search_err'] = 'Please enter your search keywords.';
         }
 
-        if(!in_array($_POST['user_type'], ['front','back'])){
+        if (!in_array($_POST['user_type'], ['front', 'back'])) {
             $data['type_err'] = 'Invalid user type error';
         }
 
         // Check if there are no errors
-        if(empty($data['search_err']) && empty($data['type_err'])){
+        if (empty($data['search_err']) && empty($data['type_err'])) {
+
+            $is_backend = $data['type'] == 'back' ? 1 : 0;
+            $users = $this->userModel->findUsersByEmailOrName($data['search']);
+
+            $categories = $this->categoryModel->getCategoryByType($is_backend);
+            $categories = $this->countCategoryDevelopers($categories, $users);
             
+            // Extracts users to specified category
+            $specified_users = [];
+            
+            foreach ($categories as $category) {
+                foreach ($users as $user) {
+                
+                    if($user->category_id !== $category->id) continue;
+                    array_push($specified_users, $user);
+                }
+            }
+            
+            $categories = $this->buildCategoriesArray($categories);
 
+            $data = [
+                'categories' => $categories,
+                'users' => $specified_users
+            ];
 
-        } 
-        
+            return $this->view('results/index', $data);
+        }
+
         return $this->view('index', $data);
     }
 
@@ -65,7 +94,7 @@ class Results extends Controller
 
     public function buildCategoriesArray($data)
     {
-        
+
         $structured_data = [];
 
         // This will work to 3 depth levels
@@ -73,12 +102,11 @@ class Results extends Controller
             // Setting main categories
             $tmp_arr = [
                 'category' => $category,
-                'total' => 0,
                 'subcategories' => []
             ];
 
             // Setting second level categories
-            foreach($this->categoryModel->getSubCategory($category->id) as $subcategory){
+            foreach ($this->categoryModel->getSubCategory($category->id) as $subcategory) {
                 $second_tmp = [
                     'category' => $subcategory,
                     // Setting 3-rd level categories
@@ -92,5 +120,17 @@ class Results extends Controller
         }
 
         return $structured_data;
+    }
+
+    public function countCategoryDevelopers($categories, $users)
+    {
+        foreach ($users as $user) {
+            foreach ($categories as $category) {
+                if ($user->category_id !== $category->id) continue;
+                isset($category->count) ? $category->count += 1 : $category->count = 1;
+            }
+        }
+
+        return $categories;
     }
 }

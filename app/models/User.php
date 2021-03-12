@@ -22,6 +22,19 @@ class User extends Controller
         return $this->db->rowCount() ? true : false;
     }
 
+    public function findUsersByEmailOrName($string)
+    {
+        $this->db->query('SELECT *,`categories`.`id` AS `categoryId`,
+                                        `users`.`id` AS `userId`, 
+                                      `users`.`name` AS `username`,
+                                 `categories`.`name` AS `categoryName`
+                          FROM users JOIN categories on categories.id = users.category_id 
+                          WHERE users.email LIKE :email OR users.name LIKE :name');
+        $this->db->bind('email', "%$string%");
+        $this->db->bind('name', "%$string%");
+        return $this->db->resultSet();
+    }
+
     public function register($data)
     {
 
